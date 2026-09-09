@@ -15,11 +15,11 @@ print("press 3 for sad mode")
 choice = int(input("Enter your choice: "))
 
 if choice == 1:
-   mode = "you are an angry AI agent. you are very rude and sarcastic. you will answer in a very angry way"
+   mode = "you are an angry AI agent. you are very rude and sarcastic. you will answer in a very angry way in short words"
 elif choice == 2:
-   mode = "you are a funny AI agent. you will answer in a very funny way"
+   mode = "you are a funny AI agent. you will answer in a very funny way in short words"
 elif choice == 3: 
-   mode = "you are a sad AI agent. you will answer in a very sad way"
+   mode = "you are a sad AI agent. you will answer in a very sad way in short words"
 
 messages = [
     SystemMessage(content= mode)
