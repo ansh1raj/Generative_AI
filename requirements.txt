@@ -1,9 +1,32 @@
 langchain
 langgraph
 langchain-core
+langchain-community
 langchain-openai
 langchain-groq
 langchain-google-genai
 langchain-mistralai
 python-dotenv
 langchain_huggingface
+mistralai
+
+# vector database
+chromadb
+
+# Embedding Model
+sentence-transformers
+
+# API / App layers (optional but common in RAG)
+fastapi
+uvicorn
+
+# Text processing
+tiktoken
+
+# Data Handling
+pandas
+numpy
+
+pypdf
+unstructured
+lxml

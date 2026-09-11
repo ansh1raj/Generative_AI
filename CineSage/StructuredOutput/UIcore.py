@@ -1,0 +1,114 @@
+import streamlit as st
+from dotenv import load_dotenv
+from langchain_core.prompts import ChatPromptTemplate
+from pydantic import BaseModel
+from typing import List, Optional
+from langchain_core.output_parsers import PydanticOutputParser
+from langchain_mistralai import ChatMistralAI
+
+
+# -------------------- Page Config --------------------
+st.set_page_config(
+    page_title="🎬 Movie Info Extractor",
+    layout="centered"
+)
+
+
+# -------------------- Setup --------------------
+load_dotenv()
+
+
+@st.cache_resource
+def get_model():
+    return ChatMistralAI(model="ministral-14b-2512")
+
+
+model = get_model()
+
+
+# -------------------- Schema --------------------
+class Movie(BaseModel):
+    title: str
+    release_year: Optional[int]
+    genre: List[str]
+    director: Optional[str]
+    cast: List[str]
+    rating: Optional[float]
+    summary: str
+
+
+parser = PydanticOutputParser(
+    pydantic_object=Movie
+)
+
+
+# -------------------- Prompt --------------------
+prompt = ChatPromptTemplate.from_messages([
+    (
+        "system",
+        """
+        Extract movie information from the paragraph.
+
+        {format_instructions}
+        """
+    ),
+    (
+        "human",
+        "{paragraph}"
+    )
+])
+
+
+# -------------------- UI --------------------
+st.title("🎬 Movie Information Extractor")
+
+st.write(
+    "Paste any movie description and AI will convert it into structured data."
+)
+
+paragraph = st.text_area(
+    "Enter Movie Paragraph",
+    height=200
+)
+
+
+if st.button("Extract Data"):
+
+    if not paragraph.strip():
+        st.warning("Please enter a paragraph first.")
+
+    else:
+        with st.spinner("Analyzing movie..."):
+
+            try:
+
+                final_prompt = prompt.invoke({
+                    "paragraph": paragraph,
+                    "format_instructions": parser.get_format_instructions()
+                })
+
+                response = model.invoke(final_prompt)
+
+                st.subheader("Raw Model Output")
+                st.code(response.content, language="json")
+
+                movie_data = parser.parse(response.content)
+
+                st.subheader("Structured Output")
+                st.json(movie_data.model_dump())
+
+                st.success("Extraction Completed Successfully!")
+
+            except Exception as e:
+
+                error_message = str(e)
+
+                if "429" in error_message or "Rate limit exceeded" in error_message:
+                    st.error(
+                        "Mistral API rate limit exceeded. "
+                        "Please wait and try again later."
+                    )
+
+                else:
+                    st.error("Failed to process the movie information.")
+                    st.exception(e)
