@@ -1,2 +1,5 @@
 .env
-.venv
+.DS_Store
+.venv/
+RAG/chroma_db/
+RAG/document loaders/deeplearning.pdf
